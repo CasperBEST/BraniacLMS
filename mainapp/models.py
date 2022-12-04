@@ -24,7 +24,14 @@ class News(models.Model):
         self.save()
 
 
+class CoursesManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
+
+
 class Courses(models.Model):
+    objects = CoursesManager()
+
     name = models.CharField(max_length=256, verbose_name="Name")
     description = models.TextField(
         verbose_name="Description", blank=True, null=True
@@ -58,7 +65,7 @@ class Lesson(models.Model):
         verbose_name="Description", blank=True, null=True
     )
     description_as_markdown = models.BooleanField(
-        verbose_name="As markdown",default=False
+        verbose_name="As markdown", default=False
     )
     created = models.DateTimeField(
         auto_now_add=True, verbose_name="Created", editable=False
@@ -66,6 +73,7 @@ class Lesson(models.Model):
     updated = models.DateTimeField(
         auto_now=True, verbose_name="Edited", editable=False
     )
+    deleted = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.course.name} | {self.num} | {self.title}"
@@ -74,9 +82,9 @@ class Lesson(models.Model):
         self.deleted = True
         self.save()
 
-    class Meta:
-        ordering = ("course", "num")
 
+class Meta:
+    ordering = ("course", "num")
 
 
 class CourseTeachers(models.Model):
